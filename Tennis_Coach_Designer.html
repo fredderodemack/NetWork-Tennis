@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tennis Coach Designer</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Exo+2:wght@300;400;600&display=swap');
+  :root {
+    --panel-bg:#152f20; --panel-border:#264a32;
+    --accent:#ff6b35; --accent2:#ff6b35;
+    --text:#e8f4f0; --text-dim:#7a9b85;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Exo 2',sans-serif;background:#122518;color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+  header{display:flex;align-items:center;gap:14px;padding:9px 18px;background:var(--panel-bg);border-bottom:1px solid var(--panel-border);flex-shrink:0;}
+  header h1{font-family:'Rajdhani',sans-serif;font-size:1.35rem;font-weight:700;letter-spacing:2px;color:var(--accent);text-transform:uppercase;}
+  header span{font-size:0.7rem;color:var(--text-dim);letter-spacing:1px;}
+  .app{display:flex;flex:1;overflow:hidden;}
+  .sidebar{width:248px;min-width:248px;background:var(--panel-bg);border-right:1px solid var(--panel-border);display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden;}
+  .section{padding:11px 13px;border-bottom:1px solid var(--panel-border);}
+  .stitle{font-family:'Rajdhani',sans-serif;font-size:0.74rem;font-weight:700;letter-spacing:2px;color:var(--accent);text-transform:uppercase;margin-bottom:7px;}
+  .view-btns{display:flex;gap:5px;}
+  .vbtn{flex:1;padding:6px 4px;font-family:'Rajdhani',sans-serif;font-size:0.74rem;font-weight:600;letter-spacing:1px;border:1px solid var(--panel-border);border-radius:4px;background:transparent;color:var(--text-dim);cursor:pointer;transition:all 0.2s;text-transform:uppercase;}
+  .vbtn.active{background:var(--accent);color:#152f20;border-color:var(--accent);}
+  .tgrid{display:grid;grid-template-columns:1fr 1fr;gap:5px;}
+  .tbtn{padding:8px 5px;font-family:'Exo 2',sans-serif;font-size:0.68rem;font-weight:600;border:1px solid var(--panel-border);border-radius:5px;background:#152f20;color:var(--text-dim);cursor:pointer;transition:all 0.2s;display:flex;flex-direction:column;align-items:center;gap:3px;}
+  .tbtn .ic{font-size:1.05rem;}
+  .tbtn:hover{border-color:var(--accent);color:var(--accent);}
+  .tbtn.active{background:rgba(255,107,53,0.12);border-color:var(--accent);color:var(--accent);}
+  .swatches{display:flex;flex-wrap:wrap;gap:5px;}
+  .sw{width:23px;height:23px;border-radius:50%;border:2px solid transparent;cursor:pointer;transition:transform 0.15s;}
+  .sw:hover{transform:scale(1.2);}
+  .sw.active{border-color:white;transform:scale(1.15);}
+  .srow{display:flex;align-items:center;gap:8px;margin-top:6px;}
+  .srow label{font-size:0.7rem;color:var(--text-dim);min-width:62px;}
+  input[type=range]{flex:1;accent-color:var(--accent);}
+  select{flex:1;background:#152f20;border:1px solid var(--panel-border);color:var(--text);padding:4px 5px;border-radius:4px;font-size:0.7rem;font-family:'Exo 2',sans-serif;}
+  .ztrow{display:flex;gap:5px;}
+  .ztbtn{flex:1;padding:6px;font-size:0.68rem;font-weight:600;font-family:'Exo 2',sans-serif;border:1px solid var(--panel-border);border-radius:4px;background:transparent;color:var(--text-dim);cursor:pointer;transition:all 0.2s;}
+  .ztbtn.active.target{background:rgba(0,200,60,0.15);border-color:#00cc44;color:#00cc44;}
+  .ztbtn.active.avoid{background:rgba(255,40,40,0.15);border-color:#ff3030;color:#ff3030;}
+  .plist{display:flex;flex-direction:column;gap:4px;}
+  .prow{display:flex;align-items:center;gap:7px;padding:5px 6px;border-radius:5px;cursor:pointer;border:1px solid transparent;transition:all 0.2s;}
+  .prow:hover{background:#152f20;border-color:var(--panel-border);}
+  .prow.sel{background:rgba(255,107,53,0.12);border-color:var(--accent);}
+  .pic{width:25px;height:25px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.68rem;font-weight:700;font-family:'Rajdhani',sans-serif;color:white;flex-shrink:0;}
+  .plbl{font-size:0.76rem;font-weight:600;flex:1;}
+  .ptog{width:12px;height:12px;border-radius:50%;border:2px solid var(--panel-border);cursor:pointer;flex-shrink:0;}
+  .ptog.on{background:var(--accent);border-color:var(--accent);}
+  .tzlist{display:flex;flex-direction:column;gap:4px;max-height:120px;overflow-y:auto;margin-top:6px;}
+  .tztag{display:flex;align-items:flex-start;gap:5px;background:#152f20;border-left:3px solid var(--accent2);padding:5px 6px;border-radius:3px;font-size:0.7rem;color:var(--text);cursor:pointer;}
+  .tztag:hover{background:#1e3828;}
+  .tztag .tzt{flex:1;word-break:break-word;line-height:1.35;}
+  .tztag button{background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:0.82rem;padding:0;flex-shrink:0;}
+  .tzinput{width:100%;background:#152f20;border:1px solid var(--panel-border);color:var(--text);padding:7px;border-radius:5px;font-family:'Exo 2',sans-serif;font-size:0.74rem;outline:none;resize:vertical;min-height:52px;}
+  .tzinput:focus{border-color:var(--accent);}
+  .abtn{margin-top:5px;width:100%;padding:6px;border:1px solid;border-radius:4px;cursor:pointer;font-family:'Rajdhani',sans-serif;font-size:0.76rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;transition:all 0.2s;}
+  .abtn.blue{border-color:var(--accent);color:var(--accent);background:rgba(255,107,53,0.08);}
+  .abtn.blue:hover{background:rgba(255,107,53,0.18);}
+  .abtn.orange{border-color:var(--accent2);color:var(--accent2);background:rgba(255,107,53,0.08);}
+  .abtn.orange:hover{background:rgba(255,107,53,0.18);}
+  .abtn.red{border-color:#ff3c3c;color:#ff3c3c;background:transparent;}
+  .abtn.red:hover{background:rgba(255,60,60,0.1);}
+  .canvas-area{flex:1;display:flex;align-items:center;justify-content:center;background:#152f20;padding:14px;overflow:auto;}
+  canvas{cursor:crosshair;border-radius:3px;box-shadow:0 0 40px rgba(74,158,104,0.08),0 4px 24px rgba(0,0,0,0.5);display:block;}
+  .sbar{padding:5px 16px;background:var(--panel-bg);border-top:1px solid var(--panel-border);display:flex;align-items:center;gap:16px;font-size:0.68rem;color:var(--text-dim);flex-shrink:0;}
+  .sbar span{display:flex;align-items:center;gap:4px;}
+  .dot{width:6px;height:6px;border-radius:50%;background:#00cc44;}
+  .tip{position:fixed;background:var(--panel-bg);border:1px solid var(--accent);color:var(--text);padding:5px 9px;border-radius:4px;font-size:0.7rem;pointer-events:none;z-index:100;display:none;}
+  .pending-indicator{padding:7px 13px;background:rgba(255,107,53,0.15);border:1px solid var(--accent2);border-radius:5px;font-size:0.72rem;color:var(--accent2);margin-top:6px;display:none;}
+</style>
+</head>
+<body>
+<header>
+  <h1>🎾 Tennis Coach Designer</h1>
+  <span>— NetWork Tennis · Terrain réel : 23,77m × 10,97m (double)</span>
+</header>
+<div class="app">
+  <div class="sidebar">
+
+    <div class="section">
+      <div class="stitle">Vue</div>
+      <div class="view-btns">
+        <button class="vbtn active" onclick="setView('top')" id="btn-top">Dessus</button>
+        <button class="vbtn" onclick="setView('3q')" id="btn-3q">3/4 Arrière</button>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="stitle">Outils</div>
+      <div class="tgrid">
+        <button class="tbtn active" onclick="setTool('select')" id="tool-select"><span class="ic">↖</span>Sélection</button>
+        <button class="tbtn" onclick="setTool('player')" id="tool-player"><span class="ic">👤</span>Joueur</button>
+        <button class="tbtn" onclick="setTool('arrow')" id="tool-arrow"><span class="ic">➜</span>Flèche</button>
+        <button class="tbtn" onclick="setTool('ball')" id="tool-ball"><span class="ic">🎾</span>Balle</button>
+        <button class="tbtn" onclick="setTool('zone')" id="tool-zone"><span class="ic">⬜</span>Zone</button>
+        <button class="tbtn" onclick="setTool('text')" id="tool-text"><span class="ic">T</span>Texte</button>
+        <button class="tbtn" onclick="setTool('cone')" id="tool-cone"><span class="ic">🔺</span>Cône</button>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="stitle">Couleur &amp; Style</div>
+      <div class="swatches" id="swatches">
+        <div class="sw active" style="background:#e63030" data-color="#e63030" onclick="setColor(this)"></div>
+        <div class="sw" style="background:#ff9200" data-color="#ff9200" onclick="setColor(this)"></div>
+        <div class="sw" style="background:#e8c000" data-color="#e8c000" onclick="setColor(this)"></div>
+        <div class="sw" style="background:#0088ee" data-color="#0088ee" onclick="setColor(this)"></div>
+        <div class="sw" style="background:#00aa33" data-color="#00aa33" onclick="setColor(this)"></div>
+        <div class="sw" style="background:#8833ff" data-color="#8833ff" onclick="setColor(this)"></div>
+        <div class="sw" style="background:#dd22aa" data-color="#dd22aa" onclick="setColor(this)"></div>
+        <div class="sw" style="background:#222222" data-color="#222222" onclick="setColor(this)"></div>
+      </div>
+      <div class="srow"><label>Épaisseur</label><input type="range" min="1" max="7" value="2" oninput="arrowWidth=+this.value"></div>
+      <div class="srow"><label>Style flèche</label>
+        <select onchange="arrowStyle=this.value">
+          <option value="solid">Pleine</option>
+          <option value="dashed">Tirets</option>
+          <option value="dotted">Pointillés</option>
+          <option value="curved">Courbée</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="stitle">Type de zone</div>
+      <div class="ztrow">
+        <button class="ztbtn target active" id="zt-target" onclick="setZoneType('target')">✅ À atteindre</button>
+        <button class="ztbtn avoid" id="zt-avoid" onclick="setZoneType('avoid')">❌ À éviter</button>
+      </div>
+      <div class="srow"><label>Opacité</label><input type="range" min="10" max="70" value="35" oninput="zoneOpacity=+this.value/100"></div>
+    </div>
+
+    <div class="section">
+      <div class="stitle">Joueurs &amp; Coach</div>
+      <div class="plist" id="plist"></div>
+    </div>
+
+    <div class="section">
+      <div class="stitle">Zones de texte</div>
+      <textarea class="tzinput" id="tzinput" placeholder="Tapez une consigne, indication, numéro d'étape..."></textarea>
+      <button class="abtn orange" onclick="prepareTZ()">✎ Cliquer sur le terrain pour placer</button>
+      <div class="pending-indicator" id="pending-ind">📍 Cliquez sur le terrain pour placer le texte</div>
+      <div class="tzlist" id="tzlist"></div>
+    </div>
+
+    <div class="section">
+      <div class="stitle">Actions</div>
+      <button class="abtn red" style="margin-bottom:5px" onclick="clearAll()">🗑 Effacer tout</button>
+      <button class="abtn orange" onclick="exportPNG()">📸 Exporter PNG</button>
+    </div>
+
+  </div>
+
+  <div class="canvas-area" id="canvas-area">
+    <canvas id="c"></canvas>
+  </div>
+</div>
+
+<div class="sbar">
+  <span><div class="dot"></div>Prêt</span>
+  <span id="s-tool">Outil : Sélection</span>
+  <span id="s-count">Éléments : 0</span>
+  <span id="s-dims">Court : 23,77m × 10,97m</span>
+</div>
+<div class="tip" id="tip"></div>
+
+<script>
+// ============================================================
+// REAL TENNIS COURT DIMENSIONS (ITF)
+// Full court: 23.77m (L) × 10.97m (W)  — doubles
+// Singles:    23.77m (L) ×  8.23m (W)
+// Doubles alley: (10.97-8.23)/2 = 1.37m each side
+// Service box depth from net: 6.40m
+// Net height at centre: 0.914m (not drawn in 2D)
+// ============================================================
+const R = {
+  W: 10.97, H: 23.77,
+  singleW: 8.23,
+  svcD: 6.40,
+  get netY()  { return this.H / 2; },           // 11.885
+  get singM() { return (this.W - this.singleW) / 2; }, // 1.37
+};
+
+// State
+let view='top', tool='select', color='#e63030';
+let zoneType='target', zoneOpacity=0.35, arrowWidth=2, arrowStyle='solid';
+let elems=[], sel=null, nextId=1;
+let drawing=false, dragging=false, dragEl=null, dragStart=null;
+let tmpArr=null, tmpZone=null, pendingTZ=null;
+
+const players=[
+  {id:'J1',lbl:'Joueur 1',col:'#e63030',on:true},
+  {id:'J2',lbl:'Joueur 2',col:'#ff9200',on:true},
+  {id:'J3',lbl:'Joueur 3',col:'#0088ee',on:false},
+  {id:'J4',lbl:'Joueur 4',col:'#00aa33',on:false},
+  {id:'J5',lbl:'Joueur 5',col:'#8833ff',on:false},
+  {id:'J6',lbl:'Joueur 6',col:'#dd22aa',on:false},
+  {id:'CO',lbl:'Coach',   col:'#f5a000',on:false},
+];
+let activePl=players[0];
+
+// Canvas & court pixel coords
+const cvs=document.getElementById('c');
+const ctx=cvs.getContext('2d');
+let C={}; // {x0,y0,cw,ch,sc} for top view; {pt} for 3q
+
+// Clearance zones (ITF recommended free space)
+const CLR = { end: 5.5, side: 3.05 };
+
+// ============================================================
+// RESIZE  — HORIZONTAL layout
+// Total canvas = court + clearance margins
+// X axis = 23.77m court + 2×5.5m = 34.77m
+// Y axis = 10.97m court + 2×3.05m = 17.07m
+// u in [0..1] maps along X (length), v in [0..1] maps along Y (width)
+// ============================================================
+function resize(){
+  const area=document.getElementById('canvas-area');
+  const aw=area.clientWidth-20, ah=area.clientHeight-20;
+  if(view==='top'){
+    const totalW = R.H + CLR.end*2;   // 34.77m
+    const totalH = R.W + CLR.side*2;  // 17.07m
+    const aspect = totalW / totalH;
+    let cw, ch;
+    if(aw/ah>aspect){ch=ah;cw=ch*aspect;}else{cw=aw;ch=cw/aspect;}
+    cvs.width=Math.round(cw); cvs.height=Math.round(ch);
+    const sc = cw / totalW;
+    const padX = Math.round(CLR.end  * sc);
+    const padY = Math.round(CLR.side * sc);
+    C = { x0:padX, y0:padY, cw:Math.round(R.H*sc), ch:Math.round(R.W*sc), sc };
+  }else{
+    const asp3=1.9;
+    let cw,ch;
+    if(aw/ah>asp3){ch=ah;cw=ch*asp3;}else{cw=aw;ch=cw/asp3;}
+    cvs.width=Math.round(cw); cvs.height=Math.round(ch);
+  }
+  redraw();
+}
+window.addEventListener('resize',resize);
+
+// ============================================================
+// COORDINATE HELPERS
+// ============================================================
+// Horizontal layout: u along length (23.77m = X), v along width (10.97m = Y)
+function uvToTop(u,v){return{x:C.x0+u*C.cw, y:C.y0+v*C.ch};}
+function topToUV(x,y){return{u:(x-C.x0)/C.cw, v:(y-C.y0)/C.ch};}
+
+function uvTo3Q(u,v){
+  if(!C.pt)return{x:cvs.width/2,y:cvs.height/2};
+  return C.pt(u,v);
+}
+function canvasTo3QUV(cx,cy){
+  if(!C._3q)return{u:0.5,v:0.5};
+  const{tL:bL,tR:bR,bL:fL,bR:fR}=C._3q; // stored as tL=bL(back), bL=fL(front)
+  // v: front(fL.y) → 1, back(bL.y) → 0
+  const v=Math.max(0,Math.min(1,(cy-bL.y)/(fL.y-bL.y)));
+  // interpolate left/right edges at this v
+  const lx=bL.x+(fL.x-bL.x)*v;
+  const rx=bR.x+(fR.x-bR.x)*v;
+  const u=Math.max(0,Math.min(1,(cx-lx)/(rx-lx)));
+  return{u,v};
+}
+
+function toC(u,v){return view==='top'?uvToTop(u,v):uvTo3Q(u,v);}
+function fromC(x,y){return view==='top'?topToUV(x,y):canvasTo3QUV(x,y);}
+
+// ============================================================
+// DRAW TOP-VIEW COURT — HORIZONTAL
+// X axis = 23.77m (length), Y axis = 10.97m (width)
+// u=0 left baseline, u=1 right baseline
+// v=0 top sideline, v=1 bottom sideline
+// ============================================================
+function drawTop(){
+  const cW=cvs.width, cH=cvs.height;
+  ctx.clearRect(0,0,cW,cH);
+
+  const sc=C.sc, x0=C.x0, y0=C.y0, cw=C.cw, ch=C.ch;
+
+  // Full canvas background (clearance area — medium grey-green like a club)
+  ctx.fillStyle='#b8c8a0';
+  ctx.fillRect(0,0,cW,cH);
+
+  // Court limits in pixels
+  const xL  = x0;
+  const xR  = x0 + cw;
+  const yT  = y0;
+  const yB  = y0 + ch;
+
+  // Net & service positions along X (23.77m length axis)
+  const netX   = x0 + R.netY * sc;          // 11.885m
+  const xST_L  = x0 + R.svcD * sc;          // 6.40m from left baseline
+  const xST_R  = x0 + (R.H - R.svcD) * sc;  // 6.40m from right baseline
+
+  // Singles & centre positions along Y (10.97m width axis)
+  const scY   = ch / R.W;
+  const midY  = y0 + ch / 2;
+  const ySiT  = y0 + R.singM * scY;                 // 1.37m from top
+  const ySiB  = y0 + (R.W - R.singM) * scY;         // 1.37m from bottom
+
+  // ---- Clearance zone markings ----
+  // Subtle dashed boundary
+  ctx.strokeStyle='rgba(80,100,60,0.35)'; ctx.lineWidth=1; ctx.setLineDash([6,5]);
+  ctx.strokeRect(1, 1, cW-2, cH-2);
+  ctx.setLineDash([]);
+
+  // ---- Court surface ----
+  ctx.fillStyle='#ffffff';
+  ctx.fillRect(xL, yT, cw, ch);
+
+  // Doubles alleys tint
+  ctx.fillStyle='rgba(150,195,240,0.22)';
+  ctx.fillRect(xL, yT,   cw, ySiT-yT);
+  ctx.fillRect(xL, ySiB, cw, yB-ySiB);
+
+  // Service box tint
+  ctx.fillStyle='rgba(150,195,240,0.18)';
+  ctx.fillRect(xL,    ySiT, xST_L-xL,  ySiB-ySiT);
+  ctx.fillRect(xST_R, ySiT, xR-xST_R,  ySiB-ySiT);
+
+  // ---- Court lines ----
+  function line(x1,y1,x2,y2,lw,col){
+    ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2);
+    ctx.strokeStyle=col||'#1a3870'; ctx.lineWidth=lw||2; ctx.stroke();
+  }
+
+  // Outer boundary (doubles sidelines + baselines)
+  ctx.strokeStyle='#1a3870'; ctx.lineWidth=2.5;
+  ctx.strokeRect(xL, yT, cw, ch);
+
+  // Singles sidelines (full length)
+  line(xL, ySiT, xR, ySiT, 2);
+  line(xL, ySiB, xR, ySiB, 2);
+
+  // Service lines
+  line(xST_L, ySiT, xST_L, ySiB, 2);
+  line(xST_R, ySiT, xST_R, ySiB, 2);
+
+  // Centre service line (net → each service line)
+  line(xST_L, midY, netX,   midY, 2);
+  line(netX,  midY, xST_R,  midY, 2);
+
+  // Centre marks on baselines (10cm)
+  const cm = sc * 0.10;
+  line(xL, midY, xL+cm, midY, 2);
+  line(xR, midY, xR-cm, midY, 2);
+
+  // ---- Net ----
+  ctx.strokeStyle='rgba(0,0,0,0.1)'; ctx.lineWidth=5;
+  ctx.beginPath(); ctx.moveTo(netX+3,yT-8); ctx.lineTo(netX+3,yB+8); ctx.stroke();
+  ctx.strokeStyle='#222'; ctx.lineWidth=3;
+  ctx.beginPath(); ctx.moveTo(netX,yT-8); ctx.lineTo(netX,yB+8); ctx.stroke();
+  ctx.fillStyle='#333';
+  ctx.fillRect(netX-6, yT-12, 12, 6);
+  ctx.fillRect(netX-6, yB+6,  12, 6);
+  ctx.strokeStyle='rgba(60,60,60,0.2)'; ctx.lineWidth=1; ctx.setLineDash([4,4]);
+  ctx.beginPath(); ctx.moveTo(netX,yT-8); ctx.lineTo(netX,yB+8); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle='#333';
+  ctx.font=`bold ${Math.max(9,sc*0.48)}px 'Exo 2',sans-serif`;
+  ctx.textAlign='center'; ctx.textBaseline='bottom';
+  ctx.fillText('Filet', netX, yT-14);
+
+}
+
+// ============================================================
+// DRAW 3/4-VIEW COURT — LANDSCAPE
+// u = along length (23.77m = left→right)
+// v = along width  (10.97m = top→bottom, perspective recedes top)
+// 3/4 rear view: we look from bottom-front, court recedes upward
+// ============================================================
+function draw3Q(){
+  const W=cvs.width, H=cvs.height;
+  ctx.clearRect(0,0,W,H);
+
+  // Sky gradient
+  const sk=ctx.createLinearGradient(0,0,0,H*0.28);
+  sk.addColorStop(0,'#c8dff5'); sk.addColorStop(1,'#e8f4ff');
+  ctx.fillStyle=sk; ctx.fillRect(0,0,W,H*0.28);
+
+  // Perspective: court corners
+  // Front (v=1, near viewer) is tall, back (v=0) is narrow
+  // u=0 = left baseline, u=1 = right baseline
+  // v=0 = far sideline (top in screen), v=1 = near sideline (bottom in screen)
+  const hy = H * 0.24; // horizon
+  const fL = {x: W*0.03, y: H*0.96}; // front-left  (u=0, v=1)
+  const fR = {x: W*0.97, y: H*0.96}; // front-right (u=1, v=1)
+  const bL = {x: W*0.09, y: hy};     // back-left   (u=0, v=0)
+  const bR = {x: W*0.91, y: hy};     // back-right  (u=1, v=0)
+
+  function lerp(a,b,t){return{x:a.x+(b.x-a.x)*t, y:a.y+(b.y-a.y)*t};}
+  // pt(u, v): u=left/right along length, v=front/back along width
+  function pt(u,v){
+    const front = lerp(fL, fR, u);
+    const back  = lerp(bL, bR, u);
+    return lerp(back, front, v); // v=0 → back (far), v=1 → front (near)
+  }
+
+  C.pt = pt;
+  C._3q = {tL:bL, tR:bR, bL:fL, bR:fR, hy};
+
+  // Normalised court positions
+  // u axis = 23.77m length: net at 0.5, service lines at svcD/H and 1-svcD/H
+  const netU   = R.netY / R.H;            // 0.5
+  const svcU_L = R.svcD / R.H;            // 0.269 (left service line)
+  const svcU_R = 1 - R.svcD / R.H;        // 0.731 (right service line)
+  const midU   = 0.5;                      // same as netU here, just alias
+  // v axis = 10.97m width: singles lines at singM/W and 1-singM/W
+  const siV_T  = R.singM / R.W;           // top singles (far side)
+  const siV_B  = 1 - R.singM / R.W;       // bottom singles (near side)
+  const midV   = 0.5;
+
+  // ---- Fill court ----
+  ctx.beginPath();
+  ctx.moveTo(fL.x,fL.y); ctx.lineTo(fR.x,fR.y);
+  ctx.lineTo(bR.x,bR.y); ctx.lineTo(bL.x,bL.y); ctx.closePath();
+  const cg=ctx.createLinearGradient(W/2,hy,W/2,H);
+  cg.addColorStop(0,'#c8e0ff'); cg.addColorStop(1,'#f2f8ff');
+  ctx.fillStyle=cg; ctx.fill();
+
+  // Service zone tints
+  function fillQ(p1,p2,p3,p4,col){
+    ctx.beginPath(); ctx.moveTo(p1.x,p1.y); ctx.lineTo(p2.x,p2.y);
+    ctx.lineTo(p3.x,p3.y); ctx.lineTo(p4.x,p4.y); ctx.closePath();
+    ctx.fillStyle=col; ctx.fill();
+  }
+  // Doubles alleys (top & bottom strips)
+  fillQ(pt(0,0),pt(1,0),pt(1,siV_T),pt(0,siV_T),'rgba(150,195,240,0.28)');
+  fillQ(pt(0,siV_B),pt(1,siV_B),pt(1,1),pt(0,1),'rgba(150,195,240,0.28)');
+  // Service boxes (left & right of net, between singles)
+  fillQ(pt(0,siV_T),pt(svcU_L,siV_T),pt(svcU_L,siV_B),pt(0,siV_B),'rgba(150,195,240,0.15)');
+  fillQ(pt(svcU_R,siV_T),pt(1,siV_T),pt(1,siV_B),pt(svcU_R,siV_B),'rgba(150,195,240,0.15)');
+
+  function pLine(u1,v1,u2,v2,lw,col){
+    const p1=pt(u1,v1), p2=pt(u2,v2);
+    ctx.beginPath(); ctx.moveTo(p1.x,p1.y); ctx.lineTo(p2.x,p2.y);
+    ctx.strokeStyle=col||'#1a3870'; ctx.lineWidth=lw||1.8; ctx.stroke();
+  }
+
+  // Outer boundary
+  pLine(0,0,1,0,2.5); pLine(0,1,1,1,2.5);
+  pLine(0,0,0,1,2.5); pLine(1,0,1,1,2.5);
+  // Singles sidelines
+  pLine(0,siV_T,1,siV_T,1.8); pLine(0,siV_B,1,siV_B,1.8);
+  // Service lines (vertical)
+  pLine(svcU_L,siV_T,svcU_L,siV_B,1.8); pLine(svcU_R,siV_T,svcU_R,siV_B,1.8);
+  // Centre service line (horizontal, between service lines)
+  pLine(svcU_L,midV,netU,midV,1.8); pLine(netU,midV,svcU_R,midV,1.8);
+  // Centre marks on baselines
+  const cmU = 0.008;
+  pLine(0,midV,cmU,midV,1.8); pLine(1,midV,1-cmU,midV,1.8);
+
+  // Net
+  pLine(netU,0,netU,1,3,'#333');
+  // Net posts
+  const np_T=pt(netU,0), np_B=pt(netU,1);
+  ctx.strokeStyle='#333'; ctx.lineWidth=3;
+  ctx.beginPath(); ctx.moveTo(np_T.x,np_T.y); ctx.lineTo(np_T.x,np_T.y-14); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(np_B.x,np_B.y); ctx.lineTo(np_B.x,np_B.y-14); ctx.stroke();
+
+  // Net label
+  const nm=pt(netU, 0.05);
+  ctx.fillStyle='#444'; ctx.font=`bold 11px 'Exo 2',sans-serif`;
+  ctx.textAlign='center'; ctx.textBaseline='bottom';
+  ctx.fillText('Filet', nm.x, nm.y-16);
+}
+
+// ============================================================
+// DRAW ELEMENTS
+// ============================================================
+function drawArrow(el){
+  const p1=toC(el.u1,el.v1),p2=toC(el.u2,el.v2);
+  const dx=p2.x-p1.x,dy=p2.y-p1.y,len=Math.hypot(dx,dy);
+  if(len<4)return;
+  ctx.save();
+  ctx.strokeStyle=el.color;ctx.fillStyle=el.color;ctx.lineWidth=el.w||2;
+  if(el.st==='dashed')ctx.setLineDash([10,5]);
+  else if(el.st==='dotted')ctx.setLineDash([3,5]);
+  else ctx.setLineDash([]);
+  if(el.st==='curved'){
+    const mx=(p1.x+p2.x)/2-dy*0.28,my=(p1.y+p2.y)/2+dx*0.28;
+    ctx.beginPath();ctx.moveTo(p1.x,p1.y);ctx.quadraticCurveTo(mx,my,p2.x,p2.y);ctx.stroke();
+  }else{
+    ctx.beginPath();ctx.moveTo(p1.x,p1.y);ctx.lineTo(p2.x,p2.y);ctx.stroke();
+  }
+  ctx.setLineDash([]);
+  const ang=Math.atan2(dy,dx),hw=(el.w||2)*3+6;
+  ctx.beginPath();
+  ctx.moveTo(p2.x,p2.y);
+  ctx.lineTo(p2.x-hw*Math.cos(ang-0.42),p2.y-hw*Math.sin(ang-0.42));
+  ctx.lineTo(p2.x-hw*Math.cos(ang+0.42),p2.y-hw*Math.sin(ang+0.42));
+  ctx.closePath();ctx.fill();
+  if(el===sel){
+    [p1,p2].forEach(p=>{
+      ctx.beginPath();ctx.arc(p.x,p.y,5,0,Math.PI*2);
+      ctx.fillStyle='#fff';ctx.fill();
+      ctx.strokeStyle='#333';ctx.lineWidth=1.5;ctx.stroke();
+    });
+  }
+  ctx.restore();
+}
+
+function drawZone(el){
+  const p1=toC(el.u1,el.v1),p2=toC(el.u2,el.v2);
+  const rx=Math.min(p1.x,p2.x),ry=Math.min(p1.y,p2.y);
+  const rw=Math.abs(p2.x-p1.x),rh=Math.abs(p2.y-p1.y);
+  if(rw<3||rh<3)return;
+  ctx.save();
+  const col=el.zt==='avoid'?'#ff2020':'#00bb33';
+  ctx.globalAlpha=el.op||0.35;
+  ctx.fillStyle=col;ctx.fillRect(rx,ry,rw,rh);
+  ctx.globalAlpha=1;
+  ctx.strokeStyle=col;ctx.lineWidth=el===sel?2.5:1.8;
+  if(el.zt==='avoid')ctx.setLineDash([8,4]);
+  ctx.strokeRect(rx,ry,rw,rh);ctx.setLineDash([]);
+  const fs=Math.min(rw,rh)*0.3;
+  if(fs>8){
+    ctx.font=`${fs}px sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.globalAlpha=0.6;
+    ctx.fillText(el.zt==='avoid'?'✕':'✓',rx+rw/2,ry+rh/2);
+  }
+  ctx.restore();
+}
+
+function drawPlayer(el){
+  const p=toC(el.u,el.v);
+  ctx.save();
+  const r=Math.max(9,cvs.width*0.016);
+  ctx.beginPath();ctx.ellipse(p.x+1,p.y+r*0.55,r*0.8,r*0.28,0,0,Math.PI*2);
+  ctx.fillStyle='rgba(0,0,0,0.18)';ctx.fill();
+  ctx.beginPath();ctx.arc(p.x,p.y,r,0,Math.PI*2);
+  ctx.fillStyle=el.col;ctx.fill();
+  ctx.strokeStyle='rgba(255,255,255,0.85)';ctx.lineWidth=1.5;ctx.stroke();
+  if(el===sel){
+    ctx.beginPath();ctx.arc(p.x,p.y,r+4,0,Math.PI*2);
+    ctx.strokeStyle='#333';ctx.lineWidth=2;ctx.setLineDash([4,3]);ctx.stroke();ctx.setLineDash([]);
+  }
+  ctx.fillStyle='#fff';
+  ctx.font=`bold ${r*0.7}px 'Exo 2',sans-serif`;
+  ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText(el.pid,p.x,p.y+1);
+  ctx.restore();
+}
+
+function drawBall(el){
+  const p=toC(el.u,el.v);
+  ctx.save();
+  const r=Math.max(5,cvs.width*0.0096);
+  ctx.beginPath();ctx.ellipse(p.x+2,p.y+r*0.55,r*0.85,r*0.3,0,0,Math.PI*2);
+  ctx.fillStyle='rgba(0,0,0,0.18)';ctx.fill();
+  const g=ctx.createRadialGradient(p.x-r*0.3,p.y-r*0.35,r*0.05,p.x,p.y,r);
+  g.addColorStop(0,'#e8ff30');g.addColorStop(0.6,'#c4e000');g.addColorStop(1,'#92a800');
+  ctx.beginPath();ctx.arc(p.x,p.y,r,0,Math.PI*2);
+  ctx.fillStyle=g;ctx.fill();
+  ctx.strokeStyle='rgba(255,255,255,0.5)';ctx.lineWidth=1;
+  ctx.beginPath();ctx.arc(p.x,p.y,r*0.6,-0.4,Math.PI+0.4);ctx.stroke();
+  ctx.beginPath();ctx.arc(p.x,p.y,r*0.6,Math.PI-0.4,Math.PI*2-0.4);ctx.stroke();
+  if(el===sel){
+    ctx.beginPath();ctx.arc(p.x,p.y,r+4,0,Math.PI*2);
+    ctx.strokeStyle='#333';ctx.lineWidth=2;ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function drawText(el){
+  const p=toC(el.u,el.v);
+  ctx.save();
+  const fs=Math.max(10,cvs.width*0.019);
+  ctx.font=`600 ${fs}px 'Exo 2',sans-serif`;
+  const lines=el.txt.split('\n');
+  const lh=fs*1.3;
+  const maxW=lines.reduce((m,l)=>Math.max(m,ctx.measureText(l).width),0);
+  const bw=maxW+18, bh=lines.length*lh+12;
+  // Box shadow
+  ctx.shadowColor='rgba(0,0,0,0.15)';ctx.shadowBlur=4;ctx.shadowOffsetY=2;
+  ctx.fillStyle='rgba(245,240,232,0.95)';
+  ctx.beginPath();ctx.roundRect(p.x,p.y,bw,bh,5);ctx.fill();
+  ctx.shadowBlur=0;ctx.shadowOffsetY=0;
+  ctx.strokeStyle=el.col||'#555';
+  ctx.lineWidth=el===sel?2.5:1.5;
+  ctx.stroke();
+  ctx.fillStyle=el.col||'#111';
+  ctx.textBaseline='top';ctx.textAlign='left';
+  lines.forEach((l,i)=>ctx.fillText(l,p.x+9,p.y+6+i*lh));
+  if(el===sel){
+    // Move handle (top-left) and delete handle (top-right)
+    ctx.fillStyle='#e63030';
+    ctx.beginPath();ctx.arc(p.x+bw,p.y,7,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#fff';ctx.font='bold 9px sans-serif';
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText('✕',p.x+bw,p.y);
+    // Drag anchor indicator
+    ctx.strokeStyle='rgba(0,0,0,0.3)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.arc(p.x+9,p.y+bh/2,4,0,Math.PI*2);ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function drawCone(el){
+  const p=toC(el.u,el.v);
+  ctx.save();
+  const h=Math.max(14,cvs.width*0.022);  // cone height in px
+  const bw=h*0.72;                        // base width
+  const col=el.col||'#ff9200';
+
+  // Shadow
+  ctx.beginPath();
+  ctx.ellipse(p.x+1, p.y+2, bw*0.55, bw*0.18, 0, 0, Math.PI*2);
+  ctx.fillStyle='rgba(0,0,0,0.22)'; ctx.fill();
+
+  // Cone body (triangle)
+  const grad=ctx.createLinearGradient(p.x-bw*0.5, p.y, p.x+bw*0.5, p.y);
+  grad.addColorStop(0,   shadeColor(col,-30));
+  grad.addColorStop(0.4, col);
+  grad.addColorStop(1,   shadeColor(col,-50));
+  ctx.beginPath();
+  ctx.moveTo(p.x, p.y-h);           // tip
+  ctx.lineTo(p.x+bw*0.5, p.y);      // bottom-right
+  ctx.lineTo(p.x-bw*0.5, p.y);      // bottom-left
+  ctx.closePath();
+  ctx.fillStyle=grad; ctx.fill();
+
+  // Horizontal stripe
+  const sy=p.y-h*0.38;
+  const sw=bw*0.38;
+  ctx.beginPath();
+  ctx.moveTo(p.x-sw*0.5, sy);
+  ctx.lineTo(p.x+sw*0.5, sy);
+  ctx.lineTo(p.x+sw*0.5+1, sy+h*0.11);
+  ctx.lineTo(p.x-sw*0.5-1, sy+h*0.11);
+  ctx.closePath();
+  ctx.fillStyle='rgba(255,255,255,0.55)'; ctx.fill();
+
+  // Cone outline
+  ctx.beginPath();
+  ctx.moveTo(p.x, p.y-h);
+  ctx.lineTo(p.x+bw*0.5, p.y);
+  ctx.lineTo(p.x-bw*0.5, p.y);
+  ctx.closePath();
+  ctx.strokeStyle='rgba(0,0,0,0.25)'; ctx.lineWidth=0.8; ctx.stroke();
+
+  if(el===sel){
+    ctx.beginPath(); ctx.arc(p.x, p.y-h/2, h*0.55+4, 0, Math.PI*2);
+    ctx.strokeStyle='#333'; ctx.lineWidth=2; ctx.setLineDash([4,3]); ctx.stroke(); ctx.setLineDash([]);
+  }
+  ctx.restore();
+}
+
+function shadeColor(hex,pct){
+  let n=parseInt(hex.slice(1),16);
+  let r=Math.min(255,Math.max(0,((n>>16)&0xff)+pct));
+  let g=Math.min(255,Math.max(0,((n>>8)&0xff)+pct));
+  let b=Math.min(255,Math.max(0,(n&0xff)+pct));
+  return `rgb(${r},${g},${b})`;
+}
+
+
+function redraw(){
+  if(view==='top')drawTop(); else draw3Q();
+  const ord={zone:0,arrow:1,ball:2,cone:2,player:3,text:4};
+  [...elems].sort((a,b)=>(ord[a.t]||0)-(ord[b.t]||0)).forEach(el=>{
+    if(el.t==='arrow')drawArrow(el);
+    else if(el.t==='zone')drawZone(el);
+    else if(el.t==='player')drawPlayer(el);
+    else if(el.t==='ball')drawBall(el);
+    else if(el.t==='cone')drawCone(el);
+    else if(el.t==='text')drawText(el);
+  });
+  if(tmpArr)drawArrow(tmpArr);
+  if(tmpZone)drawZone(tmpZone);
+  document.getElementById('s-count').textContent=`Éléments : ${elems.length}`;
+}
+
+// ============================================================
+// HIT TEST
+// ============================================================
+function hit(cx,cy){
+  const r=Math.max(15,cvs.width*0.03);
+  for(let i=elems.length-1;i>=0;i--){
+    const el=elems[i];
+    if(el.t==='text'){
+      const p=toC(el.u,el.v);
+      const fs=Math.max(10,cvs.width*0.019);
+      ctx.font=`600 ${fs}px 'Exo 2',sans-serif`;
+      const lines=el.txt.split('\n');
+      const maxW=lines.reduce((m,l)=>Math.max(m,ctx.measureText(l).width),0);
+      const bw=maxW+18,bh=lines.length*fs*1.3+12;
+      if(cx>=p.x&&cx<=p.x+bw&&cy>=p.y&&cy<=p.y+bh)return el;
+    }
+    if(el.t==='player'||el.t==='ball'||el.t==='cone'){
+      const p=toC(el.u,el.v);
+      if(Math.hypot(cx-p.x,cy-p.y)<r)return el;
+    }
+    if(el.t==='arrow'){
+      const p1=toC(el.u1,el.v1),p2=toC(el.u2,el.v2);
+      const dx=p2.x-p1.x,dy=p2.y-p1.y,len=Math.hypot(dx,dy);
+      if(len<1)continue;
+      const t=Math.max(0,Math.min(1,((cx-p1.x)*dx+(cy-p1.y)*dy)/(len*len)));
+      if(Math.hypot(p1.x+t*dx-cx,p1.y+t*dy-cy)<r*0.6)return el;
+    }
+    if(el.t==='zone'){
+      const p1=toC(el.u1,el.v1),p2=toC(el.u2,el.v2);
+      const rx=Math.min(p1.x,p2.x),ry=Math.min(p1.y,p2.y);
+      if(cx>=rx&&cx<=rx+Math.abs(p2.x-p1.x)&&cy>=ry&&cy<=ry+Math.abs(p2.y-p1.y))return el;
+    }
+  }
+  return null;
+}
+
+// ============================================================
+// MOUSE EVENTS
+// ============================================================
+function gp(e){
+  const rc=cvs.getBoundingClientRect();
+  const sx=cvs.width/rc.width,sy=cvs.height/rc.height;
+  const s=e.touches?e.touches[0]:e;
+  return{x:(s.clientX-rc.left)*sx,y:(s.clientY-rc.top)*sy};
+}
+
+cvs.addEventListener('mousedown',down);
+cvs.addEventListener('mousemove',move);
+cvs.addEventListener('mouseup',up);
+cvs.addEventListener('mouseleave',up);
+
+function down(e){
+  const{x,y}=gp(e);
+  const uv=fromC(x,y);
+
+  if(tool==='select'){
+    const h=hit(x,y);
+    sel=h;
+    if(h){
+      dragging=true;
+      dragStart={x,y,
+        eu:h.u,ev:h.v,
+        eu1:h.u1,ev1:h.v1,eu2:h.u2,ev2:h.v2,
+        uv0:fromC(x,y)};
+      dragEl=h;
+    }
+    redraw();return;
+  }
+  if(tool==='player'){
+    const ex=elems.find(e=>e.t==='player'&&e.pid===activePl.id);
+    if(ex){ex.u=uv.u;ex.v=uv.v;}
+    else elems.push({id:nextId++,t:'player',u:uv.u,v:uv.v,col:activePl.col,pid:activePl.id});
+    redraw();return;
+  }
+  if(tool==='ball'){
+    elems.push({id:nextId++,t:'ball',u:uv.u,v:uv.v});
+    redraw();return;
+  }
+  if(tool==='cone'){
+    elems.push({id:nextId++,t:'cone',u:uv.u,v:uv.v,col:color});
+    redraw();return;
+  }
+  if(tool==='text'){
+    let txt=pendingTZ;
+    if(!txt){
+      txt=prompt('Texte (Entrée = valider, plusieurs lignes possibles) :','');
+      if(!txt)return;
+    }
+    elems.push({id:nextId++,t:'text',u:uv.u,v:uv.v,txt,col:color});
+    pendingTZ=null;
+    document.getElementById('pending-ind').style.display='none';
+    updateTZList();
+    redraw();return;
+  }
+  if(tool==='arrow'){
+    drawing=true;
+    tmpArr={t:'arrow',u1:uv.u,v1:uv.v,u2:uv.u,v2:uv.v,color,w:arrowWidth,st:arrowStyle};
+    return;
+  }
+  if(tool==='zone'){
+    drawing=true;
+    tmpZone={t:'zone',u1:uv.u,v1:uv.v,u2:uv.u,v2:uv.v,zt:zoneType,op:zoneOpacity};
+    return;
+  }
+}
+
+function move(e){
+  const{x,y}=gp(e);
+  const uv=fromC(x,y);
+  const tip=document.getElementById('tip');
+  if(pendingTZ&&tool==='text'){
+    tip.style.display='block';
+    tip.style.left=(e.clientX+12)+'px';tip.style.top=(e.clientY-22)+'px';
+    tip.textContent='Cliquez pour placer';
+  }else if(tool==='player'){
+    tip.style.display='block';
+    tip.style.left=(e.clientX+12)+'px';tip.style.top=(e.clientY-22)+'px';
+    tip.textContent=`Placer ${activePl.lbl}`;
+  }else{tip.style.display='none';}
+
+  if(drawing){
+    if(tmpArr){tmpArr.u2=uv.u;tmpArr.v2=uv.v;}
+    if(tmpZone){tmpZone.u2=uv.u;tmpZone.v2=uv.v;}
+    redraw();return;
+  }
+  if(dragging&&dragEl){
+    const uv0=dragStart.uv0;
+    const du=uv.u-uv0.u,dv=uv.v-uv0.v;
+    const cl=(v,a,b)=>Math.max(a,Math.min(b,v));
+    if(dragEl.t==='player'||dragEl.t==='ball'||dragEl.t==='text'||dragEl.t==='cone'){
+      dragEl.u=cl((dragStart.eu||0)+du,0,1);
+      dragEl.v=cl((dragStart.ev||0)+dv,0,1);
+    }else if(dragEl.t==='arrow'||dragEl.t==='zone'){
+      dragEl.u1=cl((dragStart.eu1||0)+du,0,1);
+      dragEl.v1=cl((dragStart.ev1||0)+dv,0,1);
+      dragEl.u2=cl((dragStart.eu2||0)+du,0,1);
+      dragEl.v2=cl((dragStart.ev2||0)+dv,0,1);
+    }
+    redraw();
+  }
+}
+
+function up(){
+  if(drawing){
+    if(tmpArr&&Math.hypot(tmpArr.u2-tmpArr.u1,tmpArr.v2-tmpArr.v1)>0.012)
+      elems.push({...tmpArr,id:nextId++});
+    if(tmpZone&&Math.abs(tmpZone.u2-tmpZone.u1)>0.015&&Math.abs(tmpZone.v2-tmpZone.v1)>0.015)
+      elems.push({...tmpZone,id:nextId++});
+    tmpArr=null;tmpZone=null;drawing=false;
+  }
+  dragging=false;dragEl=null;
+  redraw();
+}
+
+document.addEventListener('keydown',e=>{
+  if((e.key==='Delete'||e.key==='Backspace')&&sel&&document.activeElement===document.body){
+    elems=elems.filter(el=>el!==sel);sel=null;updateTZList();redraw();
+  }
+  if(e.key==='Escape'){sel=null;pendingTZ=null;document.getElementById('pending-ind').style.display='none';redraw();}
+});
+
+// ============================================================
+// UI
+// ============================================================
+function setView(v){
+  view=v;
+  document.getElementById('btn-top').classList.toggle('active',v==='top');
+  document.getElementById('btn-3q').classList.toggle('active',v==='3q');
+  resize();
+}
+
+function setTool(t){
+  tool=t;
+  document.querySelectorAll('.tbtn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tool-'+t)?.classList.add('active');
+  document.getElementById('s-tool').textContent=`Outil : ${t}`;
+  if(t!=='text'){pendingTZ=null;document.getElementById('pending-ind').style.display='none';}
+  cvs.style.cursor=t==='select'?'default':'crosshair';
+}
+
+function setColor(el){
+  color=el.dataset.color;
+  document.querySelectorAll('.sw').forEach(s=>s.classList.remove('active'));
+  el.classList.add('active');
+  if(sel&&(sel.t==='arrow'||sel.t==='text'||sel.t==='cone')){sel.color=color;sel.col=color;redraw();}
+}
+
+function setZoneType(t){
+  zoneType=t;
+  document.getElementById('zt-target').classList.toggle('active',t==='target');
+  document.getElementById('zt-avoid').classList.toggle('active',t==='avoid');
+}
+
+function prepareTZ(){
+  const inp=document.getElementById('tzinput');
+  const txt=inp.value.trim();
+  if(!txt){alert('Entrez un texte d\'abord.');return;}
+  pendingTZ=txt;inp.value='';
+  setTool('text');
+  document.getElementById('pending-ind').style.display='block';
+}
+
+function updateTZList(){
+  const list=document.getElementById('tzlist');
+  const txts=elems.filter(e=>e.t==='text');
+  list.innerHTML='';
+  txts.forEach(el=>{
+    const d=document.createElement('div');
+    d.className='tztag';
+    d.innerHTML=`<span class="tzt">${el.txt.replace(/\n/g,' ↵ ')}</span>
+      <button onclick="event.stopPropagation();delEl(${el.id})">✕</button>`;
+    d.addEventListener('click',()=>{sel=el;redraw();});
+    list.appendChild(d);
+  });
+}
+
+function delEl(id){
+  elems=elems.filter(e=>e.id!==id);
+  if(sel&&sel.id===id)sel=null;
+  updateTZList();redraw();
+}
+
+// Players
+function renderPL(){
+  const list=document.getElementById('plist');list.innerHTML='';
+  players.forEach(p=>{
+    const d=document.createElement('div');
+    d.className='prow'+(activePl===p?' sel':'');
+    d.innerHTML=`<div class="pic" style="background:${p.col}">${p.id}</div>
+      <div class="plbl">${p.lbl}</div>
+      <div class="ptog ${p.on?'on':''}" onclick="event.stopPropagation();togglePl('${p.id}')"></div>`;
+    d.addEventListener('click',()=>{activePl=p;p.on=true;setTool('player');renderPL();});
+    list.appendChild(d);
+  });
+}
+
+function togglePl(id){
+  const p=players.find(pl=>pl.id===id);if(!p)return;
+  p.on=!p.on;
+  if(!p.on)elems=elems.filter(el=>el.pid!==id);
+  renderPL();redraw();
+}
+
+function clearAll(){
+  if(confirm('Effacer tous les éléments ?')){
+    elems=[];sel=null;pendingTZ=null;
+    document.getElementById('pending-ind').style.display='none';
+    updateTZList();redraw();
+  }
+}
+
+function exportPNG(){
+  const prev=sel;sel=null;redraw();
+  const a=document.createElement('a');
+  a.download='exercice-tennis.png';a.href=cvs.toDataURL('image/png');a.click();
+  sel=prev;redraw();
+}
+
+// INIT
+renderPL();
+resize();
+</script>
+</body>
+</html>
