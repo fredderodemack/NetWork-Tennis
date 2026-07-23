@@ -6,8 +6,8 @@
 /* ── CONFIGURATION EMAILJS ── */
 // Remplacez ces valeurs par celles de votre compte EmailJS
 // https://www.emailjs.com → Account → API Keys
-const EMAILJS_PUBLIC_KEY  = 'AhbZUYdl-uOF8LnAW';   // ex: 'aB1cD2eF3gH4iJ5k'
-const EMAILJS_SERVICE_ID  = 'service_ih7ff4g';   // ex: 'service_xxxxxxx'
+const EMAILJS_PUBLIC_KEY  = 'y3CULdln2iYu16r15';   // ex: 'aB1cD2eF3gH4iJ5k'
+const EMAILJS_SERVICE_ID  = 'service_2nx6onn';   // ex: 'service_xxxxxxx'
 const EMAILJS_TEMPLATE_ID = 'template_m4z277u';  // ex: 'template_xxxxxxx'
 
 /* ── FORMULAIRE DE CONTACT ── */
